@@ -13,52 +13,6 @@
 
 SCD30 airSensor;
 
-void setup()  
-{
-  
-  Serial.begin(9600);
-}
-
-void loop()  
-{
-  
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
 Adafruit_BMP085 bmp180;
  
 int mostrador = 0;
@@ -73,7 +27,7 @@ void setup() {
 //Initialize Serial Monitor
   Serial.begin(9600);
   
-//Setup SCD30
+//Setup SCD30 OBS:Conectar o SCD na porta analógica
   airSensor.begin(); //This will cause readings to occur every two seconds
 
 //Inicializa BMO280
