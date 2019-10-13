@@ -1,10 +1,9 @@
-//Arduino Raspberry Pi wireless Comunnication through LoRa - SX1278
-//Send 0 to 9 from Arduino through Radio head LoRa without ACK
-//Code for: www.circuitdigest.com
-//Dated: 19-4-20198
-
 #include <SPI.h> //Import SPI librarey 
 #include <RH_RF95.h> // RF95 from RadioHead Librarey 
+#include <Wire.h>//BMO280
+#include <Adafruit_BMP085.h>//BMO280
+#include <Wire.h>
+#include "SparkFun_SCD30_Arduino_Library.h" 
 
 #define RFM95_CS 10 //CS if Lora connected to pin 10
 #define RFM95_RST 9 //RST of Lora connected to pin 9
@@ -12,14 +11,76 @@
 
 #define RF95_FREQ 915.0
 
+SCD30 airSensor;
+
+void setup()  
+{
+  
+  Serial.begin(9600);
+}
+
+void loop()  
+{
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+Adafruit_BMP085 bmp180;
+ 
+int mostrador = 0;
+
 // Singleton instance of the radio driver
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
-void setup() 
-{
- 
+void setup() {
+  
+  Wire.begin();
+
 //Initialize Serial Monitor
   Serial.begin(9600);
+  
+//Setup SCD30
+  airSensor.begin(); //This will cause readings to occur every two seconds
+
+//Inicializa BMO280
+  if (!bmp180.begin()) {
+    Serial.println("Sensor nao encontrado !!");
+    while (1) {}
+  }
   
 // Reset LoRa Module 
   pinMode(RFM95_RST, OUTPUT); 
@@ -48,6 +109,49 @@ char value = 48;
 
 void loop()
 {
+//SCD30  
+if (airSensor.dataAvailable()){
+    Serial.print("co2(ppm):");
+    Serial.print(airSensor.getCO2());
+
+    Serial.print(" temp(C):");
+    Serial.print(airSensor.getTemperature(), 1);
+
+    Serial.print(" humidity(%):");
+    Serial.print(airSensor.getHumidity(), 1);
+
+    Serial.println();
+  }
+  else
+    Serial.println("No data");
+
+//  delay(1000);
+
+
+//BMO280
+  Serial.print("Temperatura : ");
+   if ( bmp180.readTemperature() < 10){
+     Serial.print(bmp180.readTemperature());
+     Serial.println(" C");
+   }else{
+     Serial.print(bmp180.readTemperature(),1);
+     Serial.println(" C");
+   }    
+   if (mostrador == 0){
+     Serial.print("Altitude : ");
+     Serial.print(bmp180.readAltitude());
+     Serial.println(" m");
+    }
+   if (mostrador == 1){
+     Serial.print("Pressao : ");
+     Serial.print(bmp180.readPressure());  
+     Serial.println(" Pa");
+   }
+    
+   delay(3000);
+   mostrador = !mostrador;
+  
+// LoRa
   Serial.print("Send: ");
   char radiopacket[1] = char(value)};
   rf95.send((uint8_t *)radiopacket, 1);
