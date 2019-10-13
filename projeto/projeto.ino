@@ -2,7 +2,6 @@
 #include <RH_RF95.h> // RF95 from RadioHead Librarey 
 #include <Wire.h>//BMO280
 #include <Adafruit_BMP085.h>//BMO280
-#include <Wire.h>
 #include "SparkFun_SCD30_Arduino_Library.h" 
 
 #define RFM95_CS 10 //CS if Lora connected to pin 10
