@@ -4,9 +4,9 @@
 #include <Adafruit_BMP085.h>//BMO280
 #include "SparkFun_SCD30_Arduino_Library.h" 
 
-#define RFM95_CS 10 //CS if Lora connected to pin 10
-#define RFM95_RST 9 //RST of Lora connected to pin 9
-#define RFM95_INT 2 //INT of Lora connected to pin 2
+#define RFM95_CS 10 //CS pin 10
+#define RFM95_RST 9 //RST pin 9
+#define RFM95_INT 2 //INT pin 2
 
 #define RF95_FREQ 915.0
 
