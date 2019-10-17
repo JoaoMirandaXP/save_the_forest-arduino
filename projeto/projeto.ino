@@ -49,7 +49,7 @@ void setup() {
   }
   
 
- //Set the default frequency 434.0MHz
+ //define a frequencia padrao 915.0MHz
   if (!rf95.setFrequency(RF95_FREQ)) {
     Serial.println("setFrequency failed");
     while (1);
@@ -76,9 +76,9 @@ if (airSensor.dataAvailable()){
     Serial.println();
   }
   else
-    Serial.println("No data");
+    Serial.println("Não há dados");
 
-//  delay(1000);
+//  delay(1800000);
 
 
 //BMO280
@@ -106,7 +106,9 @@ if (airSensor.dataAvailable()){
   
 // LoRa
   Serial.print("Send: ");
-  char radiopacket[1] = char(value)};
+  
+  char radiopacket = char(value);
+  
   rf95.send((uint8_t *)radiopacket, 1);
 
     
