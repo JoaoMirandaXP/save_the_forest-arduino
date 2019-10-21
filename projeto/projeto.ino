@@ -62,6 +62,7 @@ void setup() {
 
 void loop()
 {
+
 char co2[8];
 char temp[8];
 char hum[8];
@@ -97,7 +98,6 @@ float tmp;
   rf95.send((uint8_t *)alt , sizeof(alt));
   rf95.send((uint8_t *)pa , sizeof(pa));
     
-//  char radiopacket[7] = {1,2,3,3,4,5,5};
   
 //  rf95.send((uint8_t *)radiopacket, 1);
 
