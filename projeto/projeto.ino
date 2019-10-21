@@ -2,9 +2,9 @@
 
 #include <SPI.h> //Import SPI librarey 
 #include <RH_RF95.h> // RF95 from RadioHead Librarey 
-#include <Wire.h>//BMO280
+//#include <Wire.h>//BMO280 já incluso no Sparkfun....
 #include <Adafruit_BMP085.h>//BMO280
-#include "SparkFun_SCD30_Arduino_Library.h" 
+#include "SparkFun_SCD30_Arduino_Library.h"
 
 #define RFM95_CS 10 //CS pin 10
 #define RFM95_RST 9 //RST pin 9
@@ -20,36 +20,36 @@ Adafruit_BMP085 bmp180;
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 void setup() {
-  
-//Initialize Serial Monitor
+
+  //Initialize Serial Monitor
   Serial.begin(9600);
 
   Wire.begin();
 
-//Setup SCD30 OBS:Conectar o SCD na porta analógica
+  //Setup SCD30 OBS:Conectar o SCD na porta analógica
   airSensor.begin(); //This will cause readings to occur every two seconds
 
-//Inicializa BMO280
+  //Inicializa BMO280
   if (!bmp180.begin()) {
     Serial.println("Sensor nao encontrado !!");
     while (1) {}
   }
-  
-// Reset LoRa Module 
-  pinMode(RFM95_RST, OUTPUT); 
+
+  // Reset LoRa Module
+  pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, LOW);
   delay(10);
   digitalWrite(RFM95_RST, HIGH);
   delay(10);
 
-//Initialize LoRa Module
+  //Initialize LoRa Module
   while (!rf95.init()) {
     Serial.println("LoRa radio init failed");
     while (1);
   }
-  
 
- //define a frequencia padrao 915.0MHz
+
+  //define a frequencia padrao 915.0MHz
   if (!rf95.setFrequency(RF95_FREQ)) {
     Serial.println("setFrequency failed");
     while (1);
@@ -63,43 +63,43 @@ void setup() {
 void loop()
 {
 
-char co2[8];
-char temp[8];
-char hum[8];
-char alt[8];
-char pa[8];
-float tmp;
+  char co2[8];
+  char temp[8];
+  char hum[8];
+  char alt[8];
+  char pa[8];
+  float tmp;
 
-//SCD30  
-  if (airSensor.dataAvailable()){
+  //SCD30
+  if (airSensor.dataAvailable()) {
 
-    sprintf(co2,"%d",airSensor.getCO2()); 
-    
+    sprintf(co2, "%d", airSensor.getCO2());
+
     tmp = airSensor.getTemperature();
     //dtostrf(tmp, 5, 2, temp);
-    
+
     dtostrf(airSensor.getHumidity(), 5, 2, hum);
   }
   else
     Serial.println("Não há dados");
 
-//BMO280  
-  
-  dtostrf((tmp + bmp180.readTemperature())/2, 5 , 2 , temp);//média de temperatura entre os dois sensores
-  
-  sprintf(alt ,"%d", bmp180.readAltitude());//em metros
-  
-  sprintf(pa,"%d", bmp180.readPressure());  
+  //BMO280
 
-//envio de informação coletada
+  dtostrf((tmp + bmp180.readTemperature()) / 2, 5 , 2 , temp); //média de temperatura entre os dois sensores
+
+  sprintf(alt , "%d", bmp180.readAltitude()); //em metros
+
+  sprintf(pa, "%d", bmp180.readPressure());
+
+  //envio de informação coletada
   rf95.send((uint8_t *)co2 , sizeof(co2));
   rf95.send((uint8_t *)temp , sizeof(temp));
   rf95.send((uint8_t *)hum , sizeof(hum));
   rf95.send((uint8_t *)alt , sizeof(alt));
   rf95.send((uint8_t *)pa , sizeof(pa));
-    
-  
-//  rf95.send((uint8_t *)radiopacket, 1);
+
+
+  //  rf95.send((uint8_t *)radiopacket, 1);
 
   delay(1800000);
 
