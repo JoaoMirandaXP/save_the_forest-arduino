@@ -1,3 +1,5 @@
+//Google Startups- BUILD 1.0 Arduino
+
 #include <SPI.h> //Import SPI librarey 
 #include <RH_RF95.h> // RF95 from RadioHead Librarey 
 #include <Wire.h>//BMO280
@@ -13,19 +15,17 @@
 SCD30 airSensor;
 
 Adafruit_BMP085 bmp180;
- 
-int mostrador = 0;
 
 // Singleton instance of the radio driver
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 void setup() {
   
-  Wire.begin();
-
 //Initialize Serial Monitor
   Serial.begin(9600);
-  
+
+  Wire.begin();
+
 //Setup SCD30 OBS:Conectar o SCD na porta analógica
   airSensor.begin(); //This will cause readings to occur every two seconds
 
@@ -58,62 +58,49 @@ void setup() {
   rf95.setTxPower(18); //Transmission power of the Lora Module
 }
 
-char value = 48;
+//char value = 48;
 
 void loop()
 {
+char co2[8];
+char temp[8];
+char hum[8];
+char alt[8];
+char pa[8];
+float tmp;
+
 //SCD30  
-if (airSensor.dataAvailable()){
-    Serial.print("co2(ppm):");
-    Serial.print(airSensor.getCO2());
+  if (airSensor.dataAvailable()){
 
-    Serial.print(" temp(C):");
-    Serial.print(airSensor.getTemperature(), 1);
-
-    Serial.print(" humidity(%):");
-    Serial.print(airSensor.getHumidity(), 1);
-
-    Serial.println();
+    sprintf(co2,"%d",airSensor.getCO2()); 
+    
+    tmp = airSensor.getTemperature();
+    //dtostrf(tmp, 5, 2, temp);
+    
+    dtostrf(airSensor.getHumidity(), 5, 2, hum);
   }
   else
     Serial.println("Não há dados");
 
-//  delay(1800000);
+//BMO280  
+  
+  dtostrf((tmp + bmp180.readTemperature())/2, 5 , 2 , temp);//média de temperatura entre os dois sensores
+  
+  sprintf(alt ,"%d", bmp180.readAltitude());//em metros
+  
+  sprintf(pa,"%d", bmp180.readPressure());  
 
-
-//BMO280
-  Serial.print("Temperatura : ");
-   if ( bmp180.readTemperature() < 10){
-     Serial.print(bmp180.readTemperature());
-     Serial.println(" C");
-   }else{
-     Serial.print(bmp180.readTemperature(),1);
-     Serial.println(" C");
-   }    
-   if (mostrador == 0){
-     Serial.print("Altitude : ");
-     Serial.print(bmp180.readAltitude());
-     Serial.println(" m");
-    }
-   if (mostrador == 1){
-     Serial.print("Pressao : ");
-     Serial.print(bmp180.readPressure());  
-     Serial.println(" Pa");
-   }
+//envio de informação coletada
+  rf95.send((uint8_t *)co2 , sizeof(co2));
+  rf95.send((uint8_t *)temp , sizeof(temp));
+  rf95.send((uint8_t *)hum , sizeof(hum));
+  rf95.send((uint8_t *)alt , sizeof(alt));
+  rf95.send((uint8_t *)pa , sizeof(pa));
     
-   delay(3000);
-   mostrador = !mostrador;
+//  char radiopacket[7] = {1,2,3,3,4,5,5};
   
-// LoRa
-  Serial.print("Send: ");
-  
-  char radiopacket = char(value);
-  
-  rf95.send((uint8_t *)radiopacket, 1);
+//  rf95.send((uint8_t *)radiopacket, 1);
 
-    
-  delay(1000);
-  value++;
-  if (value > '9')
-  value = 48;
+  delay(1800000);
+
 }
