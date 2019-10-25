@@ -1,7 +1,9 @@
 //Google Startups- BUILD 1.0 Arduino
-
+//Author : João Victor Cavalcante
 #include <SPI.h> //Import SPI librarey 
-#include <RH_RF95.h> // RF95 from RadioHead Librarey 
+#include <RH_RF95.h> // RF95 from RadioHead Library
+#include <RHEncryptedDriver.h> 
+#include <Speck.h>
 //#include <Wire.h>//BMO280 já incluso no Sparkfun....
 #include <Adafruit_BMP085.h>//BMO280
 #include "SparkFun_SCD30_Arduino_Library.h"
@@ -16,8 +18,11 @@ SCD30 airSensor;
 
 Adafruit_BMP085 bmp180;
 
-// Singleton instance of the radio driver
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
+RHEncryptedDriver myDriver(rf95,myCypher);
+unsigned char key[16]={G,o,o,g,l,e,s,t,a,r,t,u,p,1,2,3}
+char sinal[];
+uint8_t sinalLen;
 
 void setup() {
 
@@ -62,7 +67,7 @@ void setup() {
 
 void loop()
 {
-
+  uint8_t data[sinalLen + 1]={0}
   char co2[8];
   char temp[8];
   char hum[8];
