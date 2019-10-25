@@ -1,5 +1,4 @@
 //Google Startups- BUILD 1.0 Arduino
-//Author : João Victor Cavalcante
 #include <SPI.h> //Import SPI librarey 
 #include <RH_RF95.h> // RF95 from RadioHead Library
 #include <RHEncryptedDriver.h> 
@@ -67,42 +66,49 @@ void setup() {
 
 void loop()
 {
+  
   uint8_t data[sinalLen + 1]={0}
-  char co2[8];
-  char temp[8];
-  char hum[8];
-  char alt[8];
-  char pa[8];
+  String co2;
+  String temp;
+  String hum;
+  String alt;
+  String pa;
   float tmp;
-
+  
   //SCD30
   if (airSensor.dataAvailable()) {
 
-    sprintf(co2, "%d", airSensor.getCO2());
+    co2 = airSensor.getCO2());
 
     tmp = airSensor.getTemperature();
     //dtostrf(tmp, 5, 2, temp);
 
-    dtostrf(airSensor.getHumidity(), 5, 2, hum);
+    hum = airSensor.getHumidity();
   }
   else
     Serial.println("Não há dados");
 
   //BMO280
 
-  dtostrf((tmp + bmp180.readTemperature()) / 2, 5 , 2 , temp); //média de temperatura entre os dois sensores
+  tmp += bmp180.readTemperature(); //média de temperatura entre os dois sensores
 
-  sprintf(alt , "%d", bmp180.readAltitude()); //em metros
+  temp = tmp/2
+  
+  alt = bmp180.readAltitude(); //em metros
 
-  sprintf(pa, "%d", bmp180.readPressure());
+  pa = bmp180.readPressure();
 
+
+  sinal = "co2,"+co2+",temp,"+temp+",hum,"+hum+",alt,"+alt+",pa,"+pa;
+  
+  sinalLen = strLen(sinal)
+
+  for(uint8_t i =0;i<=sinalLen;i++){
+    data[i] = (uint8_t)sinal[i];
+    }
+  
   //envio de informação coletada
-  rf95.send((uint8_t *)co2 , sizeof(co2));
-  rf95.send((uint8_t *)temp , sizeof(temp));
-  rf95.send((uint8_t *)hum , sizeof(hum));
-  rf95.send((uint8_t *)alt , sizeof(alt));
-  rf95.send((uint8_t *)pa , sizeof(pa));
-
+  myDriver.send(data,sizeof(data));
 
   //  rf95.send((uint8_t *)radiopacket, 1);
 
